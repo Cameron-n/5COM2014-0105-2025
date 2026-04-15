@@ -8,7 +8,7 @@ public class TalkSubmission {
     private final String title;
     private final String description; // up to 250 words
     private final Applicant applicant;
-    private final List<String> reviews = new ArrayList<>(); //up to 2 reviews
+    private final List<Review> reviews = new ArrayList<>(); //up to 2 reviews
 
     public TalkSubmission(String title, String description, Applicant applicant) {
         if (description.split("\\s+").length > 250){
@@ -39,8 +39,8 @@ public class TalkSubmission {
         reviews.add(review);
     }
 
-    public List<String> getReviews() {
-        return List.copyOf(reviews);
+    public List<Review> getReviews() {
+        return new ArrayList<>(reviews);
     }
 
     public double getAverageScore() {

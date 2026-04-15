@@ -37,7 +37,7 @@ public class Conference {
         return submissionsClosed;
     }
 
-    public List<TalkSubmission> getSubmissions() {
+    public List<TalkSubmission> getTalkSubmissions() {
         return List.copyOf(submissions);
     }
 

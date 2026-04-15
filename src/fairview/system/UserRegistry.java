@@ -1,9 +1,6 @@
 package fairview.system;
 
-import fairview.users.Applicant;
-import fairview.users.ConferenceManager;
-import fairview.users.Reviewer;
-import fairview.users.User;
+import fairview.users.*;
 
 import java.util.ArrayList;
 import java.util.List;

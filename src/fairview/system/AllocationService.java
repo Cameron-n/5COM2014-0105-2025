@@ -18,7 +18,7 @@ public class AllocationService {
 
         List<Reviewer> reviewers = conference.getReviewers();
 
-        for (TalkSubmission talk : conference.getSubmissions()) {
+        for (TalkSubmission talk : conference.getTalkSubmissions()) {
             String applicantAffiliation = talk.getApplicant().getAffiliation();
 
             //filter reviewers with different affiliation
@@ -37,8 +37,8 @@ public class AllocationService {
             Reviewer r1 = shuffled.get(0);
             Reviewer r2 = shuffled.get(1);
 
-            r1.assignTalk(talk);
-            r2.assignTalk(talk);
+            r1.addAssignedTalk(talk);
+            r2.addAssignedTalk(talk);
         }
     }
 }

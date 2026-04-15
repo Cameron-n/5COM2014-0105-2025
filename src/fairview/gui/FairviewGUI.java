@@ -1,0 +1,414 @@
+package fairview.gui;
+
+import fairview.system.*;
+import fairview.users.*;
+import fairview.talks.*;
+
+import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
+import java.awt.*;
+import java.awt.event.*;
+import java.util.List;
+
+public class FairviewGUI extends JFrame {
+
+    private final Conference conference;
+    private final UserRegistry registry;
+
+    private JTabbedPane tabs;
+
+    // USERS PANEL
+    private JTable usersTable;
+    private DefaultTableModel usersModel;
+
+    // SUBMISSIONS PANEL
+    private JTable submissionsTable;
+    private DefaultTableModel submissionsModel;
+
+    // ALLOCATION PANEL
+    private JTable allocationTable;
+    private DefaultTableModel allocationModel;
+
+    // REVIEWS PANEL
+    private JTable reviewsTable;
+    private DefaultTableModel reviewsModel;
+    private JComboBox<Reviewer> reviewerDropdown;
+
+    // RANKING PANEL
+    private JTable rankingTable;
+    private DefaultTableModel rankingModel;
+
+    // FEEDBACK PANEL
+    private JTable feedbackTable;
+    private DefaultTableModel feedbackModel;
+    private JComboBox<Applicant> applicantDropdown;
+
+    public FairviewGUI(ConferenceManager manager) {
+        this.registry = new UserRegistry();
+        registry.registerManager(manager);
+
+        this.conference = new Conference(manager);
+
+        setTitle("F@irview Conference System");
+        setSize(1000, 650);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setLocationRelativeTo(null);
+
+        initComponents();
+    }
+
+    private void initComponents() {
+        tabs = new JTabbedPane();
+
+        tabs.addTab("Users", createUsersPanel());
+        tabs.addTab("Talk Submissions", createSubmissionsPanel());
+        tabs.addTab("Allocation", createAllocationPanel());
+        tabs.addTab("Reviews", createReviewsPanel());
+        tabs.addTab("Ranking", createRankingPanel());
+        tabs.addTab("Feedback Reports", createFeedbackPanel());
+
+        add(tabs);
+    }
+
+    // ---------------------------------------------------------
+    // USERS PANEL
+    // ---------------------------------------------------------
+    private JPanel createUsersPanel() {
+        JPanel panel = new JPanel(new BorderLayout());
+
+        JLabel title = new JLabel("User Registration");
+        title.setFont(new Font("Arial", Font.BOLD, 18));
+        panel.add(title, BorderLayout.NORTH);
+
+        String[] cols = {"Name", "Affiliation", "Role"};
+        usersModel = new DefaultTableModel(cols, 0);
+        usersTable = new JTable(usersModel);
+
+        panel.add(new JScrollPane(usersTable), BorderLayout.CENTER);
+
+        JButton addUserBtn = new JButton("Register User");
+        addUserBtn.addActionListener(e -> showAddUserDialog());
+
+        JPanel bottom = new JPanel();
+        bottom.add(addUserBtn);
+        panel.add(bottom, BorderLayout.SOUTH);
+
+        return panel;
+    }
+
+    private void showAddUserDialog() {
+        JDialog dialog = new JDialog(this, "Register User", true);
+        dialog.setSize(400, 250);
+        dialog.setLocationRelativeTo(this);
+
+        JPanel form = new JPanel(new GridLayout(4, 2, 10, 10));
+
+        JTextField nameField = new JTextField();
+        JTextField affiliationField = new JTextField();
+        JComboBox<String> roleBox = new JComboBox<>(new String[]{"Applicant", "Reviewer"});
+
+        form.add(new JLabel("Name:"));
+        form.add(nameField);
+        form.add(new JLabel("Affiliation:"));
+        form.add(affiliationField);
+        form.add(new JLabel("Role:"));
+        form.add(roleBox);
+
+        JButton save = new JButton("Save");
+        save.addActionListener(e -> {
+            String name = nameField.getText();
+            String aff = affiliationField.getText();
+            String role = (String) roleBox.getSelectedItem();
+
+            if (role.equals("Applicant")) {
+                Applicant a = new Applicant(name, aff);
+                registry.registerApplicant(a);
+            } else {
+                Reviewer r = new Reviewer(name, aff);
+                registry.registerReviewer(r);
+                conference.registerReviewer(r);
+            }
+
+            usersModel.addRow(new Object[]{name, aff, role});
+            dialog.dispose();
+        });
+
+        form.add(save);
+        dialog.add(form);
+        dialog.setVisible(true);
+    }
+
+    // ---------------------------------------------------------
+    // SUBMISSIONS PANEL
+    // ---------------------------------------------------------
+    private JPanel createSubmissionsPanel() {
+        JPanel panel = new JPanel(new BorderLayout());
+
+        JLabel title = new JLabel("Talk Submissions");
+        title.setFont(new Font("Arial", Font.BOLD, 18));
+        panel.add(title, BorderLayout.NORTH);
+
+        String[] cols = {"Title", "Applicant", "Description"};
+        submissionsModel = new DefaultTableModel(cols, 0);
+        submissionsTable = new JTable(submissionsModel);
+
+        panel.add(new JScrollPane(submissionsTable), BorderLayout.CENTER);
+
+        JButton submitBtn = new JButton("Submit Talk");
+        submitBtn.addActionListener(e -> showSubmitTalkDialog());
+
+        JPanel bottom = new JPanel();
+        bottom.add(submitBtn);
+        panel.add(bottom, BorderLayout.SOUTH);
+
+        return panel;
+    }
+
+    private void showSubmitTalkDialog() {
+        JDialog dialog = new JDialog(this, "Submit Talk", true);
+        dialog.setSize(500, 400);
+        dialog.setLocationRelativeTo(this);
+
+        JPanel form = new JPanel(new GridLayout(4, 2, 10, 10));
+
+        JTextField titleField = new JTextField();
+        JTextArea descArea = new JTextArea();
+        JComboBox<Applicant> applicantBox = new JComboBox<>(registry.getApplicants().toArray(new Applicant[0]));
+
+        form.add(new JLabel("Title:"));
+        form.add(titleField);
+        form.add(new JLabel("Description (250 words):"));
+        form.add(new JScrollPane(descArea));
+        form.add(new JLabel("Applicant:"));
+        form.add(applicantBox);
+
+        JButton save = new JButton("Submit");
+        save.addActionListener(e -> {
+            Applicant a = (Applicant) applicantBox.getSelectedItem();
+            TalkSubmission talk = new TalkSubmission(titleField.getText(), descArea.getText(), a);
+
+            conference.addSubmission(talk);
+            a.addSubmission(talk);
+
+            submissionsModel.addRow(new Object[]{talk.getTitle(), a.getName(), talk.getDescription()});
+            dialog.dispose();
+        });
+
+        form.add(save);
+        dialog.add(form);
+        dialog.setVisible(true);
+    }
+
+    // ---------------------------------------------------------
+    // ALLOCATION PANEL
+    // ---------------------------------------------------------
+    private JPanel createAllocationPanel() {
+        JPanel panel = new JPanel(new BorderLayout());
+
+        JLabel title = new JLabel("Review Allocation");
+        title.setFont(new Font("Arial", Font.BOLD, 18));
+        panel.add(title, BorderLayout.NORTH);
+
+        String[] cols = {"Talk", "Reviewer 1", "Reviewer 2"};
+        allocationModel = new DefaultTableModel(cols, 0);
+        allocationTable = new JTable(allocationModel);
+
+        panel.add(new JScrollPane(allocationTable), BorderLayout.CENTER);
+
+        JButton allocateBtn = new JButton("Allocate Reviews");
+        allocateBtn.addActionListener(e -> allocateReviews());
+
+        JPanel bottom = new JPanel();
+        bottom.add(allocateBtn);
+        panel.add(bottom, BorderLayout.SOUTH);
+
+        return panel;
+    }
+
+    private void allocateReviews() {
+        conference.closeSubmissions();
+        AllocationService service = new AllocationService();
+        service.allocate(conference);
+
+        allocationModel.setRowCount(0);
+
+        for (TalkSubmission t : conference.getTalkSubmissions()) {
+            List<Reviewer> assigned = conference.getReviewers().stream()
+                    .filter(r -> r.getAssignedTalks().contains(t))
+                    .toList();
+
+            allocationModel.addRow(new Object[]{
+                    t.getTitle(),
+                    assigned.get(0).getName(),
+                    assigned.get(1).getName()
+            });
+        }
+    }
+
+    // ---------------------------------------------------------
+    // REVIEWS PANEL
+    // ---------------------------------------------------------
+    private JPanel createReviewsPanel() {
+        JPanel panel = new JPanel(new BorderLayout());
+
+        JLabel title = new JLabel("Submit Reviews");
+        title.setFont(new Font("Arial", Font.BOLD, 18));
+        panel.add(title, BorderLayout.NORTH);
+
+        reviewerDropdown = new JComboBox<>(registry.getReviewers().toArray(new Reviewer[0]));
+        reviewerDropdown.addActionListener(e -> refreshReviewerTalks());
+
+        panel.add(reviewerDropdown, BorderLayout.NORTH);
+
+        String[] cols = {"Talk Title", "Description"};
+        reviewsModel = new DefaultTableModel(cols, 0);
+        reviewsTable = new JTable(reviewsModel);
+
+        panel.add(new JScrollPane(reviewsTable), BorderLayout.CENTER);
+
+        JButton reviewBtn = new JButton("Submit Review");
+        reviewBtn.addActionListener(e -> showReviewDialog());
+
+        JPanel bottom = new JPanel();
+        bottom.add(reviewBtn);
+        panel.add(bottom, BorderLayout.SOUTH);
+
+        return panel;
+    }
+
+    private void refreshReviewerTalks() {
+        reviewsModel.setRowCount(0);
+
+        Reviewer r = (Reviewer) reviewerDropdown.getSelectedItem();
+        if (r == null) return;
+
+        for (TalkSubmission t : r.getAssignedTalks()) {
+            reviewsModel.addRow(new Object[]{t.getTitle(), t.getDescription()});
+        }
+    }
+
+    private void showReviewDialog() {
+        Reviewer r = (Reviewer) reviewerDropdown.getSelectedItem();
+        int row = reviewsTable.getSelectedRow();
+        if (row == -1) return;
+
+        TalkSubmission talk = r.getAssignedTalks().get(row);
+
+        JDialog dialog = new JDialog(this, "Submit Review", true);
+        dialog.setSize(400, 300);
+        dialog.setLocationRelativeTo(this);
+
+        JPanel form = new JPanel(new GridLayout(3, 2, 10, 10));
+
+        JTextField scoreField = new JTextField();
+        JTextArea feedbackArea = new JTextArea();
+
+        form.add(new JLabel("Score (1–10):"));
+        form.add(scoreField);
+        form.add(new JLabel("Feedback (250 chars):"));
+        form.add(new JScrollPane(feedbackArea));
+
+        JButton save = new JButton("Submit");
+        save.addActionListener(e -> {
+            int score = Integer.parseInt(scoreField.getText());
+            String feedback = feedbackArea.getText();
+
+            r.submitReview(talk, score, feedback);
+            dialog.dispose();
+        });
+
+        form.add(save);
+        dialog.add(form);
+        dialog.setVisible(true);
+    }
+
+    // ---------------------------------------------------------
+    // RANKING PANEL
+    // ---------------------------------------------------------
+    private JPanel createRankingPanel() {
+        JPanel panel = new JPanel(new BorderLayout());
+
+        JLabel title = new JLabel("Ranking");
+        title.setFont(new Font("Arial", Font.BOLD, 18));
+        panel.add(title, BorderLayout.NORTH);
+
+        String[] cols = {"Talk", "Average Score", "Selected"};
+        rankingModel = new DefaultTableModel(cols, 0);
+        rankingTable = new JTable(rankingModel);
+
+        panel.add(new JScrollPane(rankingTable), BorderLayout.CENTER);
+
+        JButton rankBtn = new JButton("Generate Ranking");
+        rankBtn.addActionListener(e -> generateRanking());
+
+        JPanel bottom = new JPanel();
+        bottom.add(rankBtn);
+        panel.add(bottom, BorderLayout.SOUTH);
+
+        return panel;
+    }
+
+    private void generateRanking() {
+        RankingService service = new RankingService();
+        List<TalkSubmission> ranked = service.rankTalks(
+                conference.getTalkSubmissions(),
+                conference.getManager().getNumberOfSlots()
+        );
+
+        rankingModel.setRowCount(0);
+
+        for (TalkSubmission t : conference.getTalkSubmissions()) {
+            boolean selected = ranked.contains(t);
+            rankingModel.addRow(new Object[]{
+                    t.getTitle(),
+                    t.getAverageScore(),
+                    selected ? "YES" : "NO"
+            });
+        }
+    }
+
+    // ---------------------------------------------------------
+    // FEEDBACK PANEL
+    // ---------------------------------------------------------
+    private JPanel createFeedbackPanel() {
+        JPanel panel = new JPanel(new BorderLayout());
+
+        JLabel title = new JLabel("Feedback Reports");
+        title.setFont(new Font("Arial", Font.BOLD, 18));
+        panel.add(title, BorderLayout.NORTH);
+
+        applicantDropdown = new JComboBox<>(registry.getApplicants().toArray(new Applicant[0]));
+        applicantDropdown.addActionListener(e -> refreshFeedbackTable());
+
+        panel.add(applicantDropdown, BorderLayout.NORTH);
+
+        String[] cols = {"Talk", "Selected", "Reviewer Comments"};
+        feedbackModel = new DefaultTableModel(cols, 0);
+        feedbackTable = new JTable(feedbackModel);
+
+        panel.add(new JScrollPane(feedbackTable), BorderLayout.CENTER);
+
+        return panel;
+    }
+
+    private void refreshFeedbackTable() {
+        feedbackModel.setRowCount(0);
+
+        Applicant a = (Applicant) applicantDropdown.getSelectedItem();
+        if (a == null) return;
+
+        FeedbackService service = new FeedbackService();
+
+        for (TalkSubmission t : a.getTalkSubmissions()) {
+            boolean selected = t.getAverageScore() > 0; // placeholder
+
+            FeedbackReport report = service.generateFeedback(t);
+
+            feedbackModel.addRow(new Object[]{
+                    t.getTitle(),
+                    selected ? "YES" : "NO",
+                    String.join(" | ", report.getReviewerComments())
+            });
+        }
+    }
+}

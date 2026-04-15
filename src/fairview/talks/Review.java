@@ -5,7 +5,7 @@ import fairview.users.Reviewer;
 public class Review {
     private final Reviewer reviewer;
     private final int score; // 1-10
-    private final String feedback; //up to 250 characters
+    private final String feedback; // up to 250 characters
 
     public Review(Reviewer reviewer, int score, String feedback) {
         if (score < 1 || score > 10) {
@@ -30,6 +30,10 @@ public class Review {
     }
 
     public String getFeedback() {
+        return feedback;
+    }
+
+    public String getComment() {
         return feedback;
     }
 }
