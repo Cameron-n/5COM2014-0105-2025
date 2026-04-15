@@ -1,6 +1,6 @@
-package f@irview.talks;
+package fairview.talks;
 
-import f@irview.users.Applicant;
+import fairview.users.Applicant;
 import java.util.ArrayList;
 import java.util.List;
 

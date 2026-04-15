@@ -1,4 +1,4 @@
-package f@irview.users;
+package fairview.users;
 
 import fairview.talks.TalkSubmission;
 import fairview.talks.Review;

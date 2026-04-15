@@ -1,4 +1,4 @@
-package f@irview.talks;
+package fairview.talks;
 
 public class FeedbackReport {
     private final TalkSubmission talkSubmission;

@@ -1,6 +1,6 @@
-package f@irview.talks;
+package fairview.talks;
 
-import f@irview.users.Reviewer;
+import fairview.users.Reviewer;
 
 public class Review {
     private final Reviewer reviewer;

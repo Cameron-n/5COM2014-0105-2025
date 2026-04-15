@@ -1,4 +1,4 @@
-package f@irview.users;
+package fairview.users;
 
 public abstract class User { 
     private final String name;

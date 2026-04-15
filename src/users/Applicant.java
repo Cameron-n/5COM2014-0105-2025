@@ -1,4 +1,4 @@
-package f@irview.users;
+package fairview.users;
 
 import fairview.talks.TalkSubmission;
 import java.util.ArrayList;
