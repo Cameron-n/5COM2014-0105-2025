@@ -1,5 +1,3 @@
-package fairview;
-
 import fairview.gui.FairviewGUI;
 import fairview.users.ConferenceManager;
 
