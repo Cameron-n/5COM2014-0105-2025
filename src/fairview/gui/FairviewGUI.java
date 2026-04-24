@@ -1,5 +1,6 @@
 package fairview.gui;
 
+import fairview.database.FairviewData;
 import fairview.system.*;
 import fairview.users.*;
 import fairview.talks.*;
@@ -66,6 +67,14 @@ public class FairviewGUI extends JFrame {
         tabs.addTab("Ranking", createRankingPanel());
         tabs.addTab("Feedback Reports", createFeedbackPanel());
 
+        //add users from database
+        String sql = "SELECT name, affiliation FROM User;";
+        var userlist = FairviewData.getData(sql);
+        for (int i=0; i < userlist.size(); i++) {
+            registry.setApplicant(userlist.get(i).get(0), userlist.get(i).get(1));
+            usersModel.addRow(new Object[]{userlist.get(i).get(0), userlist.get(i).get(1), "applicant"});
+        }
+ 
         add(tabs);
     }
 

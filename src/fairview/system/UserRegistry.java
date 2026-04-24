@@ -1,6 +1,7 @@
 package fairview.system;
 
 import fairview.users.*;
+import fairview.database.FairviewData;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,6 +21,12 @@ public class UserRegistry {
 
     public void registerApplicant(Applicant applicant) {
         applicants.add(applicant);
+        String sql = "INSERT INTO User(name, affiliation, userType) VALUES("
+                     + "'" + applicant.getName() + "'" + "," 
+                     + "'" + applicant.getAffiliation() + "'" + "," 
+                     + "'" + "Applicant" + "'"
+                     + ")";
+        FairviewData.addData(sql);
     }
 
     public void registerReviewer(Reviewer reviewer) {
@@ -36,5 +43,10 @@ public class UserRegistry {
 
     public List<Reviewer> getReviewers() {
         return List.copyOf(reviewers);
+    }
+    
+    public void setApplicant(String name, String aff) {
+        Applicant a = new Applicant(name, aff);
+        applicants.add(a);
     }
 }
