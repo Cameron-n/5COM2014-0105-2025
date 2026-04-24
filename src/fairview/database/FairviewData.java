@@ -18,7 +18,7 @@ public class FairviewData {
         }
     }
     
-    public static ArrayList<ArrayList<String>> getData(String sql) {
+    public static ArrayList<ArrayList<String>> getData(String sql, List<String> columns) {
         ArrayList<ArrayList<String>> data = new ArrayList<ArrayList<String>>();
         try (var conn = DriverManager.getConnection(url);
              var stmt = conn.createStatement();
@@ -26,8 +26,9 @@ public class FairviewData {
             
             while (rs.next()) {
                 var temp = new ArrayList<String>();
-                temp.add(rs.getString("name"));
-                temp.add(rs.getString("affiliation"));
+                for (String i: columns) {
+                    temp.add(rs.getString(i));
+                }
                 data.add(temp);
             }
         } catch (SQLException e) {
