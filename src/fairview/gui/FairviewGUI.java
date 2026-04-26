@@ -56,12 +56,15 @@ public class FairviewGUI extends JFrame {
         setLocationRelativeTo(null);
 
         initComponents();
-        loadData();
+        loadUserData();
+        loadTalkData();
     }
 
     private void initComponents() {
         tabs = new JTabbedPane();
 
+        // TODO add tab for login
+        // Add functions to hide/show tabs/tables based on user
         tabs.addTab("Users", createUsersPanel());
         tabs.addTab("Talk Submissions", createSubmissionsPanel());
         tabs.addTab("Allocation", createAllocationPanel());
@@ -72,14 +75,54 @@ public class FairviewGUI extends JFrame {
         add(tabs);
     }
     
-    private void loadData() {
+    private void loadUserData() {
+        // TODO finish loading data for all tables (See design)
         //initialize users from database
-        String sql = "SELECT name, affiliation FROM User;";
-        List<String> columns = Arrays.asList("name", "affiliation");
+        String sql = "SELECT name, affiliation, userType FROM User;";
+        List<String> columns = Arrays.asList("name", "affiliation", "userType");
         var userlist = FairviewData.getData(sql, columns);
         for (int i=0; i < userlist.size(); i++) {
-            registry.setApplicant(userlist.get(i).get(0), userlist.get(i).get(1));
-            usersModel.addRow(new Object[]{userlist.get(i).get(0), userlist.get(i).get(1), "applicant"});
+            if (userlist.get(i).get(2).equals("Applicant")) {
+                registry.setApplicant(userlist.get(i).get(0), userlist.get(i).get(1));
+            } else {
+                Reviewer r = registry.setReviewer(userlist.get(i).get(0), userlist.get(i).get(1));
+                conference.registerReviewer(r);
+            }
+            usersModel.addRow(new Object[]{userlist.get(i).get(0), userlist.get(i).get(1), userlist.get(i).get(2)});
+        }
+    }
+    
+    private void loadTalkData() {
+        // TODO add talk data to conference and applicant
+        String sql = "SELECT title, applicantID, description FROM Talk;";
+        List<String> columns = Arrays.asList("title", "applicantID", "description");
+        var talklist = FairviewData.getData(sql, columns);
+        for (int i=0; i < talklist.size(); i++) {
+            final int index = i;
+            String sql_name = "SELECT name FROM User"
+                              + " WHERE userID="
+                              + "'" + talklist.get(i).get(1) + "';";
+            List<String> name_col = Arrays.asList("name");
+            String applicantName = FairviewData.getData(sql_name, name_col).get(0).get(0);
+            registry.getApplicants().stream().filter(o -> o.getName().equals(applicantName)).forEach(
+                o -> {
+                    o.setSubmission(talklist.get(index).get(0), talklist.get(index).get(2));
+                    List<TalkSubmission> submissionList = o.getTalkSubmissions();
+                    for (TalkSubmission j: submissionList) {
+                        conference.addSubmission(j);
+                    }
+                }
+            );
+            submissionsModel.addRow(new Object[]{talklist.get(i).get(0), talklist.get(i).get(1), talklist.get(i).get(2)});
+        }
+    }
+    
+    private void loadReviewData() {
+        String sql = "SELECT score, feedback, talkID, reviewerID FROM Review;";
+        List<String> columns = Arrays.asList("score", "feedback", "talkID", "reviewerID");
+        var reviewlist = FairviewData.getData(sql, columns);
+        for (int i=0; i < reviewlist.size(); i++) {
+            reviewsModel.addRow(new Object[]{reviewlist.get(i).get(0), reviewlist.get(i).get(1), reviewlist.get(i).get(2)});
         }
     }
 
@@ -133,16 +176,21 @@ public class FairviewGUI extends JFrame {
             String aff = affiliationField.getText();
             String role = (String) roleBox.getSelectedItem();
 
+            var success = true;
             if (role.equals("Applicant")) {
                 Applicant a = new Applicant(name, aff);
-                registry.registerApplicant(a);
+                success = registry.registerApplicant(a);
             } else {
                 Reviewer r = new Reviewer(name, aff);
-                registry.registerReviewer(r);
-                conference.registerReviewer(r);
+                success = registry.registerReviewer(r);
+                if (success) {
+                    conference.registerReviewer(r);
+                }
             }
 
-            usersModel.addRow(new Object[]{name, aff, role});
+            if (success) {
+                usersModel.addRow(new Object[]{name, aff, role});
+            }
             dialog.dispose();
         });
 
@@ -200,10 +248,12 @@ public class FairviewGUI extends JFrame {
             Applicant a = (Applicant) applicantBox.getSelectedItem();
             TalkSubmission talk = new TalkSubmission(titleField.getText(), descArea.getText(), a);
 
-            conference.addSubmission(talk);
-            a.addSubmission(talk);
+            boolean success = a.addSubmission(talk);
+            if (success) {
+                conference.addSubmission(talk);
+                submissionsModel.addRow(new Object[]{talk.getTitle(), a.getName(), talk.getDescription()});
+            }
 
-            submissionsModel.addRow(new Object[]{talk.getTitle(), a.getName(), talk.getDescription()});
             dialog.dispose();
         });
 

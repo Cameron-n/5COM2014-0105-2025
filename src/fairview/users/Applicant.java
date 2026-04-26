@@ -1,7 +1,9 @@
 package fairview.users;
 
+import fairview.database.FairviewData;
 import fairview.talks.TalkSubmission;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class Applicant extends User {
@@ -11,8 +13,27 @@ public class Applicant extends User {
         super(name, affiliation);
     }
 
-    public void addSubmission(TalkSubmission submission) {
-        talkSubmissions.add(submission);
+    public boolean addSubmission(TalkSubmission submission) {
+        String sql_get = "SELECT userID FROM User"
+                         + " WHERE name=" 
+                         + "'" + this.getName() + "';";
+        List<String> sql_col = Arrays.asList("userID");
+        String userID = FairviewData.getData(sql_get, sql_col).get(0).get(0);
+        String sql = "INSERT INTO Talk(title, description, applicantID) VALUES("
+                     + "'" + submission.getTitle() + "'" + "," 
+                     + "'" + submission.getDescription() + "'" + "," 
+                     + "'" + userID + "'"
+                     + ")";
+        boolean success = FairviewData.addData(sql);
+        if (success) {
+            talkSubmissions.add(submission);
+        }
+        return success;
+    }
+    
+    public void setSubmission(String title, String description) {
+        TalkSubmission s = new TalkSubmission(title, description, this);
+        talkSubmissions.add(s);
     }
 
     public List<TalkSubmission> getTalkSubmissions() {

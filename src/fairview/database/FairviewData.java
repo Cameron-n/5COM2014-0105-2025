@@ -9,12 +9,14 @@ import java.util.List;
 public class FairviewData {
     private static String url = "jdbc:sqlite:fairview.db";
 
-    public static void addData(String sql) {
+    public static boolean addData(String sql) {
         try (var conn = DriverManager.getConnection(url);
              var pstmt = conn.prepareStatement(sql)) {
                 pstmt.executeUpdate();
+                return true;
         } catch (SQLException e) {
             System.err.println(e.getMessage());
+            return false;
         }
     }
     

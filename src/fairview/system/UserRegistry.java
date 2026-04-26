@@ -19,18 +19,30 @@ public class UserRegistry {
         this.manager = manager;
     }
 
-    public void registerApplicant(Applicant applicant) {
-        applicants.add(applicant);
+    public boolean registerApplicant(Applicant applicant) {
         String sql = "INSERT INTO User(name, affiliation, userType) VALUES("
                      + "'" + applicant.getName() + "'" + "," 
                      + "'" + applicant.getAffiliation() + "'" + "," 
                      + "'" + "Applicant" + "'"
                      + ")";
-        FairviewData.addData(sql);
+        boolean success = FairviewData.addData(sql);
+        if (success) {
+            applicants.add(applicant);
+        }
+        return success;
     }
 
-    public void registerReviewer(Reviewer reviewer) {
-        reviewers.add(reviewer);
+    public boolean registerReviewer(Reviewer reviewer) {
+        String sql = "INSERT INTO User(name, affiliation, userType) VALUES("
+                     + "'" + reviewer.getName() + "'" + "," 
+                     + "'" + reviewer.getAffiliation() + "'" + "," 
+                     + "'" + "Reviewer" + "'"
+                     + ")";
+        boolean success = FairviewData.addData(sql);
+        if (success) {
+            reviewers.add(reviewer);
+        }
+        return success;
     }
 
     public ConferenceManager getManager() {
@@ -48,5 +60,11 @@ public class UserRegistry {
     public void setApplicant(String name, String aff) {
         Applicant a = new Applicant(name, aff);
         applicants.add(a);
+    }
+    
+    public Reviewer setReviewer(String name, String aff) {
+        Reviewer r = new Reviewer(name, aff);
+        reviewers.add(r);
+        return r;
     }
 }

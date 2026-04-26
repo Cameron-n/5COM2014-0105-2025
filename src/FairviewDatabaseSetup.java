@@ -21,7 +21,7 @@ public class FairviewDatabaseSetup {
         //create table: User
         sql = "CREATE TABLE IF NOT EXISTS User ("
             + "     userID INTEGER PRIMARY KEY,"
-            + "     name CHAR(255),"
+            + "     name CHAR(255) UNIQUE,"
             + "     email VARCHAR(255),"
             + "     password VARCHAR(255),"
             + "     affiliation CHAR(255),"
@@ -50,7 +50,7 @@ public class FairviewDatabaseSetup {
         //create table: Talk
         sql = "CREATE TABLE IF NOT EXISTS Talk ("
             + "     talkID INTEGER PRIMARY KEY,"
-            + "     title CHAR(255),"
+            + "     title CHAR(255) UNIQUE,"
             + "     description CHAR(255),"
             + "     status CHAR(255),"
             + "     applicantID INTEGER,"
