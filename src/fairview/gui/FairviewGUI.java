@@ -10,6 +10,7 @@ import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.util.List;
 import java.util.Arrays;
+import java.util.ArrayList;
 
 public class FairviewGUI extends JFrame {
 
@@ -17,6 +18,10 @@ public class FairviewGUI extends JFrame {
     private final UserRegistry registry;
 
     private JTabbedPane tabs;
+
+    // LOGIN PANEL
+    private JTable loginTable;
+    private DefaultTableModel loginModel;
 
     // USERS PANEL
     private JTable usersTable;
@@ -56,35 +61,28 @@ public class FairviewGUI extends JFrame {
         setLocationRelativeTo(null);
 
         initComponents();
-        loadUserData();
-        loadTalkData();
     }
 
     private void initComponents() {
         tabs = new JTabbedPane();
 
-        // TODO add tab for login
-        // Add functions to hide/show tabs/tables based on user
+        tabs.addTab("Login", createLoginPanel());
         tabs.addTab("Users", createUsersPanel());
-        tabs.addTab("Talk Submissions", createSubmissionsPanel());
-        tabs.addTab("Allocation", createAllocationPanel());
-        tabs.addTab("Reviews", createReviewsPanel());
-        tabs.addTab("Ranking", createRankingPanel());
-        tabs.addTab("Feedback Reports", createFeedbackPanel());
 
         add(tabs);
     }
     
-    private void loadUserData() {
-        // TODO finish loading data for all tables (See design)
-        //initialize users from database
-        String sql = "SELECT name, affiliation, userType FROM User;";
+    private void loadUserData(boolean all, String username) {
+        String sql = "SELECT name, affiliation, userType FROM User";
+        if (!all) {
+            sql = sql + " WHERE name=" + "'" + username + "'";
+        }
         List<String> columns = Arrays.asList("name", "affiliation", "userType");
         var userlist = FairviewData.getData(sql, columns);
         for (int i=0; i < userlist.size(); i++) {
             if (userlist.get(i).get(2).equals("Applicant")) {
                 registry.setApplicant(userlist.get(i).get(0), userlist.get(i).get(1));
-            } else {
+            } else if (userlist.get(i).get(2).equals("Reviewer")) {
                 Reviewer r = registry.setReviewer(userlist.get(i).get(0), userlist.get(i).get(1));
                 conference.registerReviewer(r);
             }
@@ -92,9 +90,15 @@ public class FairviewGUI extends JFrame {
         }
     }
     
-    private void loadTalkData() {
-        // TODO add talk data to conference and applicant
-        String sql = "SELECT title, applicantID, description FROM Talk;";
+    private void loadTalkData(boolean all, String username) {
+        String sql = "SELECT title, applicantID, description FROM Talk";
+        if (!all) {
+            String sql_name = "SELECT userID FROM User"
+                              + " WHERE name=" + "'" + username + "'";
+            List<String> sql_cols = Arrays.asList("userID");
+            String applicantid = FairviewData.getData(sql_name, sql_cols).get(0).get(0);
+            sql = sql + " WHERE applicantID=" + applicantid;
+        }
         List<String> columns = Arrays.asList("title", "applicantID", "description");
         var talklist = FairviewData.getData(sql, columns);
         for (int i=0; i < talklist.size(); i++) {
@@ -117,13 +121,107 @@ public class FairviewGUI extends JFrame {
         }
     }
     
-    private void loadReviewData() {
+    private void loadReviewData(boolean all) {
         String sql = "SELECT score, feedback, talkID, reviewerID FROM Review;";
         List<String> columns = Arrays.asList("score", "feedback", "talkID", "reviewerID");
         var reviewlist = FairviewData.getData(sql, columns);
         for (int i=0; i < reviewlist.size(); i++) {
             reviewsModel.addRow(new Object[]{reviewlist.get(i).get(0), reviewlist.get(i).get(1), reviewlist.get(i).get(2)});
         }
+    }
+
+    // ---------------------------------------------------------
+    // LOGIN PANEL
+    // ---------------------------------------------------------
+    private JPanel createLoginPanel() {
+        JPanel panel = new JPanel(new BorderLayout());
+
+        String[] cols = {"Name", "Password"};
+        loginModel = new DefaultTableModel(cols, 0);
+
+        JButton addUserBtn = new JButton("Login");
+        addUserBtn.addActionListener(e -> showLoginDialog());
+
+        JPanel bottom = new JPanel();
+        bottom.add(addUserBtn);
+        panel.add(bottom, BorderLayout.SOUTH);
+
+        return panel;
+    }
+
+    private void showLoginDialog() {
+        JDialog dialog = new JDialog(this, "Login", true);
+        dialog.setSize(400, 250);
+        dialog.setLocationRelativeTo(this);
+
+        JPanel form = new JPanel(new GridLayout(4, 2, 10, 10));
+
+        JTextField nameField = new JTextField();
+        JTextField passwordField = new JTextField();
+
+        form.add(new JLabel("Name:"));
+        form.add(nameField);
+        form.add(new JLabel("Password:"));
+        form.add(passwordField);
+
+        JButton save = new JButton("Login");
+        save.addActionListener(e -> {
+            String name = nameField.getText();
+            String pass = passwordField.getText();
+
+            String sql = "SELECT password, userType FROM User"
+                         + " WHERE name="
+                         + "'" + name + "'";
+            List<String> cols = Arrays.asList("password", "userType");
+            
+            String role;
+            String password = " ";
+            try {
+                ArrayList<ArrayList<String>> data = FairviewData.getData(sql, cols);
+                role = data.get(0).get(1);
+                password = data.get(0).get(0);
+            } catch(Exception err) {
+                role = "";
+            }
+            
+            if (pass.equals(password)) {
+                if (role.equals("Manager")) {
+                    tabs.removeAll();
+                    tabs.addTab("Users", createUsersPanel());
+                    loadUserData(true, name);
+                    tabs.addTab("Talk Submissions", createSubmissionsPanel());
+                    loadTalkData(true, name);
+                    tabs.addTab("Allocation", createAllocationPanel());
+                    tabs.addTab("Reviews", createReviewsPanel());
+                    loadReviewData(true);
+                    tabs.addTab("Ranking", createRankingPanel());
+                    tabs.addTab("Feedback Reports", createFeedbackPanel());
+                } else if (role.equals("Applicant")) {
+                    tabs.removeAll();
+                    //tabs.addTab("Users", createUsersPanel());
+                    tabs.addTab("Talk Submissions", createSubmissionsPanel());
+                    loadUserData(false, name);
+                    loadTalkData(false, name);
+                    tabs.addTab("Feedback Reports", createFeedbackPanel());
+                } else if (role.equals("Reviewer")) {
+                    tabs.removeAll();
+                    loadUserData(false, name);
+                    tabs.addTab("Reviews", createReviewsPanel());
+                    loadReviewData(false);
+                    tabs.addTab("Feedback Reports", createFeedbackPanel());
+                } else {
+                    //do nothing 
+                }
+            } else {
+                //do nothing
+            }
+
+            dialog.dispose();
+        });
+
+        form.add(save);
+        dialog.add(form);
+        dialog.setVisible(true);
     }
 
     // ---------------------------------------------------------
@@ -157,14 +255,17 @@ public class FairviewGUI extends JFrame {
         dialog.setSize(400, 250);
         dialog.setLocationRelativeTo(this);
 
-        JPanel form = new JPanel(new GridLayout(4, 2, 10, 10));
+        JPanel form = new JPanel(new GridLayout(5, 2, 10, 10));
 
         JTextField nameField = new JTextField();
+        JTextField loginField = new JTextField();
         JTextField affiliationField = new JTextField();
         JComboBox<String> roleBox = new JComboBox<>(new String[]{"Applicant", "Reviewer"});
 
         form.add(new JLabel("Name:"));
         form.add(nameField);
+        form.add(new JLabel("Password:"));
+        form.add(loginField);
         form.add(new JLabel("Affiliation:"));
         form.add(affiliationField);
         form.add(new JLabel("Role:"));
@@ -173,16 +274,17 @@ public class FairviewGUI extends JFrame {
         JButton save = new JButton("Save");
         save.addActionListener(e -> {
             String name = nameField.getText();
+            String pass = loginField.getText();
             String aff = affiliationField.getText();
             String role = (String) roleBox.getSelectedItem();
 
             var success = true;
             if (role.equals("Applicant")) {
                 Applicant a = new Applicant(name, aff);
-                success = registry.registerApplicant(a);
-            } else {
+                success = registry.registerApplicant(a, pass);
+            } else if (role.equals("Reviewer")) {
                 Reviewer r = new Reviewer(name, aff);
-                success = registry.registerReviewer(r);
+                success = registry.registerReviewer(r, pass);
                 if (success) {
                     conference.registerReviewer(r);
                 }

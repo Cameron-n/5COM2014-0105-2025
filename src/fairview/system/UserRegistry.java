@@ -19,9 +19,10 @@ public class UserRegistry {
         this.manager = manager;
     }
 
-    public boolean registerApplicant(Applicant applicant) {
-        String sql = "INSERT INTO User(name, affiliation, userType) VALUES("
+    public boolean registerApplicant(Applicant applicant, String pass) {
+        String sql = "INSERT INTO User(name, password, affiliation, userType) VALUES("
                      + "'" + applicant.getName() + "'" + "," 
+                     + "'" + pass + "'" + ","
                      + "'" + applicant.getAffiliation() + "'" + "," 
                      + "'" + "Applicant" + "'"
                      + ")";
@@ -32,9 +33,10 @@ public class UserRegistry {
         return success;
     }
 
-    public boolean registerReviewer(Reviewer reviewer) {
-        String sql = "INSERT INTO User(name, affiliation, userType) VALUES("
+    public boolean registerReviewer(Reviewer reviewer, String pass) {
+        String sql = "INSERT INTO User(name, password, affiliation, userType) VALUES("
                      + "'" + reviewer.getName() + "'" + "," 
+                     + "'" + pass + "'" + ","
                      + "'" + reviewer.getAffiliation() + "'" + "," 
                      + "'" + "Reviewer" + "'"
                      + ")";
