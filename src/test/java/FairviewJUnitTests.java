@@ -1,8 +1,10 @@
-import fairview.users.*;
-import fairview.talks.*;
-import fairview.system.*;
-
+package test.java;
 import org.junit.jupiter.api.Test;
+
+import fairview.system.*;
+import fairview.talks.*;
+import fairview.users.*;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.time.LocalDate;

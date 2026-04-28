@@ -1,3 +1,4 @@
+package fairview;
 import fairview.gui.FairviewGUI;
 import fairview.gui.FairviewLookAndFeel;
 import fairview.users.ConferenceManager;

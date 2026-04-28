@@ -1,11 +1,11 @@
 package fairview.system;
 
-import fairview.talks.TalkSubmission;
-import fairview.users.Reviewer;
-import fairview.users.ConferenceManager;
-
 import java.util.ArrayList;
 import java.util.List;
+
+import fairview.talks.TalkSubmission;
+import fairview.users.ConferenceManager;
+import fairview.users.Reviewer;
 
 public class Conference {
 

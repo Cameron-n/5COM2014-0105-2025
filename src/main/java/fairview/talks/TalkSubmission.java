@@ -1,8 +1,9 @@
 package fairview.talks;
 
-import fairview.users.Applicant;
 import java.util.ArrayList;
 import java.util.List;
+
+import fairview.users.Applicant;
 
 public class TalkSubmission {
     private final String title;
@@ -14,6 +15,11 @@ public class TalkSubmission {
         if (description.split("\\s+").length > 250){
             throw new IllegalArgumentException("Description must be 250 words or less.");
         }
+
+        if (applicant == null) {
+            throw new IllegalArgumentException("Applicant cannot be null");
+        }
+
 
         this.title = title;
         this.description = description;

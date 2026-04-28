@@ -1,9 +1,9 @@
 package fairview.system;
 
-import fairview.users.*;
-
 import java.util.ArrayList;
 import java.util.List;
+
+import fairview.users.*;
 
 public class UserRegistry {
 

@@ -1,11 +1,11 @@
 package fairview.system;
 
-import fairview.talks.TalkSubmission;
-import fairview.talks.FeedbackReport;
-import fairview.talks.Review;
-
 import java.util.ArrayList;
 import java.util.List;
+
+import fairview.talks.FeedbackReport;
+import fairview.talks.Review;
+import fairview.talks.TalkSubmission;
 
 public class FeedbackService {
 
