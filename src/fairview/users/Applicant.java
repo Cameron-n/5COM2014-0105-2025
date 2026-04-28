@@ -11,6 +11,12 @@ public class Applicant extends User {
         super(name, affiliation);
     }
 
+    @Override
+    public String toString() {
+        return getName();
+    }
+
+
     public void addSubmission(TalkSubmission submission) {
         talkSubmissions.add(submission);
     }

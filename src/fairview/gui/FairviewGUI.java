@@ -74,21 +74,24 @@ public class FairviewGUI extends JFrame {
     // ---------------------------------------------------------
     private JPanel createUsersPanel() {
         JPanel panel = new JPanel(new BorderLayout());
+        FairviewTheme.stylePanel(panel);
 
-        JLabel title = new JLabel("User Registration");
-        title.setFont(new Font("Arial", Font.BOLD, 18));
+        JLabel title = FairviewTheme.title("User Registration");
         panel.add(title, BorderLayout.NORTH);
 
         String[] cols = {"Name", "Affiliation", "Role"};
         usersModel = new DefaultTableModel(cols, 0);
         usersTable = new JTable(usersModel);
+        FairviewTheme.styleTable(usersTable);
 
         panel.add(new JScrollPane(usersTable), BorderLayout.CENTER);
 
         JButton addUserBtn = new JButton("Register User");
+        FairviewTheme.styleButton(addUserBtn);
         addUserBtn.addActionListener(e -> showAddUserDialog());
 
         JPanel bottom = new JPanel();
+        bottom.setBackground(FairviewTheme.BACKGROUND);
         bottom.add(addUserBtn);
         panel.add(bottom, BorderLayout.SOUTH);
 
@@ -101,6 +104,7 @@ public class FairviewGUI extends JFrame {
         dialog.setLocationRelativeTo(this);
 
         JPanel form = new JPanel(new GridLayout(4, 2, 10, 10));
+        FairviewTheme.styleCard(form);
 
         JTextField nameField = new JTextField();
         JTextField affiliationField = new JTextField();
@@ -114,6 +118,7 @@ public class FairviewGUI extends JFrame {
         form.add(roleBox);
 
         JButton save = new JButton("Save");
+        FairviewTheme.styleButton(save);
         save.addActionListener(e -> {
             String name = nameField.getText();
             String aff = affiliationField.getText();
@@ -142,21 +147,39 @@ public class FairviewGUI extends JFrame {
     // ---------------------------------------------------------
     private JPanel createSubmissionsPanel() {
         JPanel panel = new JPanel(new BorderLayout());
+        FairviewTheme.stylePanel(panel);
 
-        JLabel title = new JLabel("Talk Submissions");
-        title.setFont(new Font("Arial", Font.BOLD, 18));
+        JLabel title = FairviewTheme.title("Talk Submissions");
         panel.add(title, BorderLayout.NORTH);
 
         String[] cols = {"Title", "Applicant", "Description"};
         submissionsModel = new DefaultTableModel(cols, 0);
         submissionsTable = new JTable(submissionsModel);
+        FairviewTheme.styleTable(submissionsTable);
 
         panel.add(new JScrollPane(submissionsTable), BorderLayout.CENTER);
 
         JButton submitBtn = new JButton("Submit Talk");
-        submitBtn.addActionListener(e -> showSubmitTalkDialog());
+        FairviewTheme.styleButton(submitBtn);
+
+        submitBtn.addActionListener(e -> {
+
+            // VALIDATION 1: No applicants
+            if (registry.getApplicants().isEmpty()) {
+                JOptionPane.showMessageDialog(
+                        this,
+                        "No applicants have been registered yet.\nPlease register at least one applicant first.",
+                        "No Applicants Found",
+                        JOptionPane.ERROR_MESSAGE
+                );
+                return;
+            }
+
+            showSubmitTalkDialog();
+        });
 
         JPanel bottom = new JPanel();
+        bottom.setBackground(FairviewTheme.BACKGROUND);
         bottom.add(submitBtn);
         panel.add(bottom, BorderLayout.SOUTH);
 
@@ -169,6 +192,7 @@ public class FairviewGUI extends JFrame {
         dialog.setLocationRelativeTo(this);
 
         JPanel form = new JPanel(new GridLayout(4, 2, 10, 10));
+        FairviewTheme.styleCard(form);
 
         JTextField titleField = new JTextField();
         JTextArea descArea = new JTextArea();
@@ -182,6 +206,7 @@ public class FairviewGUI extends JFrame {
         form.add(applicantBox);
 
         JButton save = new JButton("Submit");
+        FairviewTheme.styleButton(save);
         save.addActionListener(e -> {
             Applicant a = (Applicant) applicantBox.getSelectedItem();
             TalkSubmission talk = new TalkSubmission(titleField.getText(), descArea.getText(), a);
@@ -203,21 +228,39 @@ public class FairviewGUI extends JFrame {
     // ---------------------------------------------------------
     private JPanel createAllocationPanel() {
         JPanel panel = new JPanel(new BorderLayout());
+        FairviewTheme.stylePanel(panel);
 
-        JLabel title = new JLabel("Review Allocation");
-        title.setFont(new Font("Arial", Font.BOLD, 18));
+        JLabel title = FairviewTheme.title("Review Allocation");
         panel.add(title, BorderLayout.NORTH);
 
         String[] cols = {"Talk", "Reviewer 1", "Reviewer 2"};
         allocationModel = new DefaultTableModel(cols, 0);
         allocationTable = new JTable(allocationModel);
+        FairviewTheme.styleTable(allocationTable);
 
         panel.add(new JScrollPane(allocationTable), BorderLayout.CENTER);
 
         JButton allocateBtn = new JButton("Allocate Reviews");
-        allocateBtn.addActionListener(e -> allocateReviews());
+        FairviewTheme.styleButton(allocateBtn);
+
+        allocateBtn.addActionListener(e -> {
+
+            // VALIDATION 2: No submissions
+            if (conference.getTalkSubmissions().isEmpty()) {
+                JOptionPane.showMessageDialog(
+                        this,
+                        "No talks have been submitted yet.\nPlease submit at least one talk before allocating reviews.",
+                        "No Submissions Found",
+                        JOptionPane.ERROR_MESSAGE
+                );
+                return;
+            }
+
+            allocateReviews();
+        });
 
         JPanel bottom = new JPanel();
+        bottom.setBackground(FairviewTheme.BACKGROUND);
         bottom.add(allocateBtn);
         panel.add(bottom, BorderLayout.SOUTH);
 
@@ -225,7 +268,6 @@ public class FairviewGUI extends JFrame {
     }
 
     private void allocateReviews() {
-        conference.closeSubmissions();
         AllocationService service = new AllocationService();
         service.allocate(conference);
 
@@ -249,26 +291,43 @@ public class FairviewGUI extends JFrame {
     // ---------------------------------------------------------
     private JPanel createReviewsPanel() {
         JPanel panel = new JPanel(new BorderLayout());
+        FairviewTheme.stylePanel(panel);
 
-        JLabel title = new JLabel("Submit Reviews");
-        title.setFont(new Font("Arial", Font.BOLD, 18));
+        JLabel title = FairviewTheme.title("Submit Reviews");
         panel.add(title, BorderLayout.NORTH);
 
         reviewerDropdown = new JComboBox<>(registry.getReviewers().toArray(new Reviewer[0]));
         reviewerDropdown.addActionListener(e -> refreshReviewerTalks());
-
         panel.add(reviewerDropdown, BorderLayout.NORTH);
 
         String[] cols = {"Talk Title", "Description"};
         reviewsModel = new DefaultTableModel(cols, 0);
         reviewsTable = new JTable(reviewsModel);
+        FairviewTheme.styleTable(reviewsTable);
 
         panel.add(new JScrollPane(reviewsTable), BorderLayout.CENTER);
 
         JButton reviewBtn = new JButton("Submit Review");
-        reviewBtn.addActionListener(e -> showReviewDialog());
+        FairviewTheme.styleButton(reviewBtn);
+
+        reviewBtn.addActionListener(e -> {
+
+            // VALIDATION 3: No reviewers
+            if (registry.getReviewers().isEmpty()) {
+                JOptionPane.showMessageDialog(
+                        this,
+                        "No reviewers have been registered yet.\nPlease register at least one reviewer first.",
+                        "No Reviewers Found",
+                        JOptionPane.ERROR_MESSAGE
+                );
+                return;
+            }
+
+            showReviewDialog();
+        });
 
         JPanel bottom = new JPanel();
+        bottom.setBackground(FairviewTheme.BACKGROUND);
         bottom.add(reviewBtn);
         panel.add(bottom, BorderLayout.SOUTH);
 
@@ -298,6 +357,7 @@ public class FairviewGUI extends JFrame {
         dialog.setLocationRelativeTo(this);
 
         JPanel form = new JPanel(new GridLayout(3, 2, 10, 10));
+        FairviewTheme.styleCard(form);
 
         JTextField scoreField = new JTextField();
         JTextArea feedbackArea = new JTextArea();
@@ -308,6 +368,7 @@ public class FairviewGUI extends JFrame {
         form.add(new JScrollPane(feedbackArea));
 
         JButton save = new JButton("Submit");
+        FairviewTheme.styleButton(save);
         save.addActionListener(e -> {
             int score = Integer.parseInt(scoreField.getText());
             String feedback = feedbackArea.getText();
@@ -326,21 +387,42 @@ public class FairviewGUI extends JFrame {
     // ---------------------------------------------------------
     private JPanel createRankingPanel() {
         JPanel panel = new JPanel(new BorderLayout());
+        FairviewTheme.stylePanel(panel);
 
-        JLabel title = new JLabel("Ranking");
-        title.setFont(new Font("Arial", Font.BOLD, 18));
+        JLabel title = FairviewTheme.title("Ranking");
         panel.add(title, BorderLayout.NORTH);
 
         String[] cols = {"Talk", "Average Score", "Selected"};
         rankingModel = new DefaultTableModel(cols, 0);
         rankingTable = new JTable(rankingModel);
+        FairviewTheme.styleTable(rankingTable);
 
         panel.add(new JScrollPane(rankingTable), BorderLayout.CENTER);
 
         JButton rankBtn = new JButton("Generate Ranking");
-        rankBtn.addActionListener(e -> generateRanking());
+        FairviewTheme.styleButton(rankBtn);
+
+        rankBtn.addActionListener(e -> {
+
+            // VALIDATION 4: No reviews
+            boolean noReviews = conference.getTalkSubmissions().stream()
+                    .allMatch(t -> t.getAverageScore() == 0);
+
+            if (noReviews) {
+                JOptionPane.showMessageDialog(
+                        this,
+                        "No reviews have been submitted yet.\nPlease ensure reviewers submit reviews before generating rankings.",
+                        "No Reviews Found",
+                        JOptionPane.ERROR_MESSAGE
+                );
+                return;
+            }
+
+            generateRanking();
+        });
 
         JPanel bottom = new JPanel();
+        bottom.setBackground(FairviewTheme.BACKGROUND);
         bottom.add(rankBtn);
         panel.add(bottom, BorderLayout.SOUTH);
 
@@ -371,19 +453,20 @@ public class FairviewGUI extends JFrame {
     // ---------------------------------------------------------
     private JPanel createFeedbackPanel() {
         JPanel panel = new JPanel(new BorderLayout());
+        FairviewTheme.stylePanel(panel);
 
-        JLabel title = new JLabel("Feedback Reports");
-        title.setFont(new Font("Arial", Font.BOLD, 18));
+        JLabel title = FairviewTheme.title("Feedback Reports");
         panel.add(title, BorderLayout.NORTH);
 
         applicantDropdown = new JComboBox<>(registry.getApplicants().toArray(new Applicant[0]));
-        applicantDropdown.addActionListener(e -> refreshFeedbackTable());
-
         panel.add(applicantDropdown, BorderLayout.NORTH);
+
+        applicantDropdown.addActionListener(e -> refreshFeedbackTable());
 
         String[] cols = {"Talk", "Selected", "Reviewer Comments"};
         feedbackModel = new DefaultTableModel(cols, 0);
         feedbackTable = new JTable(feedbackModel);
+        FairviewTheme.styleTable(feedbackTable);
 
         panel.add(new JScrollPane(feedbackTable), BorderLayout.CENTER);
 
@@ -399,7 +482,7 @@ public class FairviewGUI extends JFrame {
         FeedbackService service = new FeedbackService();
 
         for (TalkSubmission t : a.getTalkSubmissions()) {
-            boolean selected = t.getAverageScore() > 0; // placeholder
+            boolean selected = t.getAverageScore() > 0;
 
             FeedbackReport report = service.generateFeedback(t);
 

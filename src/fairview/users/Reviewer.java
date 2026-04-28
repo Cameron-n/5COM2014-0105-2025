@@ -13,6 +13,11 @@ public class Reviewer extends User {
         super(name, affiliation);
     }
 
+    @Override
+    public String toString() {
+        return getName();
+    }
+
     public void addAssignedTalk(TalkSubmission talk) {
         assignedTalks.add(talk);
     }
