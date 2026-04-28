@@ -3,6 +3,8 @@ Assessed coding project for a university module.
 
 ## Make Instructions
 
+cd scripts/
+
 ### To run the GUI:
 
 1. make clean
