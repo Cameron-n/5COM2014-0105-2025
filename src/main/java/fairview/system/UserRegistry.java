@@ -6,6 +6,8 @@ import fairview.database.FairviewData;
 import java.util.ArrayList;
 import java.util.List;
 
+import fairview.users.*;
+
 public class UserRegistry {
 
     private ConferenceManager manager;

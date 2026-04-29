@@ -6,6 +6,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import fairview.talks.TalkSubmission;
+
 public class Applicant extends User {
     private final List<TalkSubmission> talkSubmissions = new ArrayList<>();
     
@@ -34,6 +36,10 @@ public class Applicant extends User {
     public void setSubmission(String title, String description) {
         TalkSubmission s = new TalkSubmission(title, description, this);
         talkSubmissions.add(s);
+
+    @Override
+    public String toString() {
+        return getName();
     }
 
     public List<TalkSubmission> getTalkSubmissions() {

@@ -8,11 +8,19 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import fairview.talks.Review;
+import fairview.talks.TalkSubmission;
+
 public class Reviewer extends User {
     private final List<TalkSubmission> assignedTalks = new ArrayList<>();
 
     public Reviewer(String name, String affiliation) {
         super(name, affiliation);
+    }
+
+    @Override
+    public String toString() {
+        return getName();
     }
 
     public void addAssignedTalk(TalkSubmission talk) {
