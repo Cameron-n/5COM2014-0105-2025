@@ -1,4 +1,4 @@
-package fairview.gui;
+package main.java.fairview.gui;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;

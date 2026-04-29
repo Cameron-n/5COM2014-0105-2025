@@ -1,7 +1,7 @@
-package fairview;
-import fairview.gui.FairviewGUI;
-import fairview.gui.FairviewLookAndFeel;
-import fairview.users.ConferenceManager;
+package main.java.fairview;
+import main.java.fairview.gui.FairviewGUI;
+import main.java.fairview.gui.FairviewLookAndFeel;
+import main.java.fairview.users.ConferenceManager;
 
 public class FairviewApp {
     public static void main(String[] args) {

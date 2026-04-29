@@ -1,9 +1,9 @@
 package test.java;
 import org.junit.jupiter.api.Test;
 
-import fairview.system.*;
-import fairview.talks.*;
-import fairview.users.*;
+import main.java.fairview.system.*;
+import main.java.fairview.talks.*;
+import main.java.fairview.users.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 

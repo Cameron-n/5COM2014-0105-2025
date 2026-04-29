@@ -1,11 +1,11 @@
-package fairview.system;
+package main.java.fairview.system;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
-import fairview.talks.TalkSubmission;
-import fairview.users.Reviewer;
+import main.java.fairview.talks.TalkSubmission;
+import main.java.fairview.users.Reviewer;
 
 public class AllocationService {
 
