@@ -1,4 +1,4 @@
-package fairview.system;
+package main.java.fairview.system;
 
 import fairview.users.*;
 import fairview.database.FairviewData;
@@ -6,7 +6,7 @@ import fairview.database.FairviewData;
 import java.util.ArrayList;
 import java.util.List;
 
-import fairview.users.*;
+import main.java.fairview.users.*;
 
 public class UserRegistry {
 

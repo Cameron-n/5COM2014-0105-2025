@@ -1,4 +1,4 @@
-package fairview.users;
+package main.java.fairview.users;
 
 import fairview.database.FairviewData;
 import fairview.talks.TalkSubmission;
@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import fairview.talks.TalkSubmission;
+import main.java.fairview.talks.TalkSubmission;
 
 public class Applicant extends User {
     private final List<TalkSubmission> talkSubmissions = new ArrayList<>();

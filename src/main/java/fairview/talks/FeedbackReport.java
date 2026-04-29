@@ -1,4 +1,4 @@
-package fairview.talks;
+package main.java.fairview.talks;
 
 import java.util.List;
 

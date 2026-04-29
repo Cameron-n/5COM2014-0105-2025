@@ -1,4 +1,4 @@
-package fairview.users;
+package main.java.fairview.users;
 
 import java.time.LocalDate;
 
