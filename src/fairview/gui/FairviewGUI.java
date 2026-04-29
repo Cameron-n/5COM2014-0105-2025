@@ -123,11 +123,32 @@ public class FairviewGUI extends JFrame {
         String sql = "SELECT score, feedback, talkID, reviewerID FROM Review;";
         List<String> columns = Arrays.asList("score", "feedback", "talkID", "reviewerID");
         var reviewlist = FairviewData.getData(sql, columns);
-        for (int i=0; i < reviewlist.size(); i++) {
-            reviewsModel.addRow(new Object[]{reviewlist.get(i).get(0), reviewlist.get(i).get(1), reviewlist.get(i).get(2)});
+        if (reviewlist.size() > 0) {
+            conference.closeSubmissions();
+            AllocationService service = new AllocationService();
+            service.allocate(conference);
+            for (int i=0; i < reviewlist.size(); i++) {
+                if (reviewlist.get(i).get(0) != null) {
+                    reviewsModel.addRow(new Object[]{reviewlist.get(i).get(0), reviewlist.get(i).get(1), reviewlist.get(i).get(2)});
+                }
+            }
+            String sql_alloc = "SELECT talkID, title FROM Talk";
+            List<String> col_alloc = Arrays.asList("talkID", "title");
+            var alloclist = FairviewData.getData(sql_alloc, col_alloc);
+            for (int i=0; i < alloclist.size(); i++) {
+                String sql_talk = "SELECT name FROM User JOIN Review ON userID=reviewerID"
+                                  + " WHERE talkID=" + "'" + alloclist.get(i).get(0) + "'";                
+                List<String> col_talk = Arrays.asList("name");
+                var reviewerlist = FairviewData.getData(sql_talk, col_talk);
+                allocationModel.addRow(new Object[]{
+                    alloclist.get(i).get(1),
+                    reviewerlist.get(0).get(0),
+                    reviewerlist.get(1).get(0)
+                });
+            }
         }
     }
-
+    
     // ---------------------------------------------------------
     // LOGIN PANEL
     // ---------------------------------------------------------
@@ -348,9 +369,9 @@ public class FairviewGUI extends JFrame {
             Applicant a = (Applicant) applicantBox.getSelectedItem();
             TalkSubmission talk = new TalkSubmission(titleField.getText(), descArea.getText(), a);
 
+            conference.addSubmission(talk);
             boolean success = a.addSubmission(talk);
             if (success) {
-                conference.addSubmission(talk);
                 submissionsModel.addRow(new Object[]{talk.getTitle(), a.getName(), talk.getDescription()});
             }
 

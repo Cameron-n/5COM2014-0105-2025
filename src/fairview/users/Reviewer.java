@@ -27,13 +27,12 @@ public class Reviewer extends User {
                               + "'" + this.getName() + "';";
         List<String> sql_reviewer_col = Arrays.asList("userID");
         String reviewerID = FairviewData.getData(sql_reviewer, sql_reviewer_col).get(0).get(0);
-        String sql = "UPDATE Review"
-                     + " SET reviewerID=" + "'" + reviewerID + "'"
-                     + " WHERE talkID=" + "'" + talkID + "';";
-        boolean success = FairviewData.addData(sql);
-        if (success) {
-            assignedTalks.add(talk);
-        }
+        String sql = "INSERT INTO Review(reviewerID, talkID) VALUES("
+                     + "'" + reviewerID + "',"
+                     + "'" + talkID + "'"
+                     + ")";
+        FairviewData.addData(sql);
+        assignedTalks.add(talk);
     }
 
     public List<TalkSubmission> getAssignedTalks() {

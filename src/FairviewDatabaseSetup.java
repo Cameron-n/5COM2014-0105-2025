@@ -67,7 +67,8 @@ public class FairviewDatabaseSetup {
             + "     talkID INTEGER,"
             + "     reviewerID INTEGER,"
             + "     FOREIGN KEY(reviewerID) REFERENCES Reviewer(userID),"
-            + "     FOREIGN KEY(talkID) REFERENCES Talk(talkID)"
+            + "     FOREIGN KEY(talkID) REFERENCES Talk(talkID),"
+            + "     UNIQUE(reviewerID, talkID)"
             + ");";
 
         createTable(sql, url);
@@ -82,6 +83,20 @@ public class FairviewDatabaseSetup {
             + ");";
 
         createTable(sql, url);
+        
+        //add test data
+        sql = "INSERT INTO User(name, password, affiliation, userType) VALUES("
+            + "     'manager', 'manager', 'manager', 'Manager'"
+            + "     ),("
+            + "     'applicant1', 'applicant1', 'TESCO', 'Applicant'"
+            + "     ),("
+            + "     'applicant2', 'applicant2', 'ASDA', 'Applicant'"
+            + "     ),("
+            + "     'reviewer1', 'reviewer1', 'Waitrose', 'Reviewer'"
+            + "     ),("
+            + "     'reviewer2', 'reviewer2', 'Morrisons', 'Reviewer'"
+            + "     )";
+        addData(sql, url);
 
     }
 
@@ -92,6 +107,17 @@ public class FairviewDatabaseSetup {
             stmt.execute(sql);
         } catch (SQLException e) {
             System.out.println(e.getMessage());
+        }
+    }
+
+    public static boolean addData(String sql, String url) {
+        try (var conn = DriverManager.getConnection(url);
+             var pstmt = conn.prepareStatement(sql)) {
+                pstmt.executeUpdate();
+                return true;
+        } catch (SQLException e) {
+            System.err.println(e.getMessage());
+            return false;
         }
     }
 }
