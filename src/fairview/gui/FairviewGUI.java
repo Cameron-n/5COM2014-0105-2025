@@ -127,44 +127,10 @@ public class FairviewGUI extends JFrame {
             conference.closeSubmissions();
             if (name == "Applicant") {
                 return;
-            }
-            if (name == "Manager") {
+            } else if (name == "Manager") {
                 AllocationService service = new AllocationService();
                 service.allocate(conference);
-            } else {
-                //TODO 
-                //add reviews to talk
-                //Also, how is feedback added for applicants?
-                String sql_talks = "SELECT title, description, applicantID FROM Talk"
-                                   + " JOIN Review ON Talk.talkID = Review.talkID"
-                                   + " JOIN User on reviewerID=userID"
-                                   + " WHERE name=" + "'" + name + "'";
-                List<String> cols_talks = Arrays.asList("title", "description", "applicantID");
-                ArrayList<ArrayList<String>> talkslist = FairviewData.getData(sql_talks, cols_talks);
-                for (int i=0; i < talkslist.size(); i++) {
-                    String sql_app = "SELECT name, affiliation FROM User"
-                                     + " WHERE userID=" + "'" + talkslist.get(i).get(2) + "'";
-                    List<String> cols_app = Arrays.asList("name", "affiliation");
-                    ArrayList<String> app = FairviewData.getData(sql_app, cols_app).get(0);
-                    Applicant a = new Applicant(app.get(0), app.get(1));
-                    TalkSubmission t = new TalkSubmission(talkslist.get(i).get(0), talkslist.get(i).get(1), a);
-                    registry.getReviewers().getFirst().addAssignedTalk(t);
-                }
-
-            }
-            if (!all) {
-                String sql_reviews = "SELECT score, feedback, talkID, reviewerID FROM Review"
-                                     + " JOIN User ON reviewerID=userID"
-                                     + " WHERE name=" + "'" + name + "'";
-                List<String> cols_rev = Arrays.asList("score", "feedback", "talkID", "reviewerID");
-                reviewlist = FairviewData.getData(sql_reviews, cols_rev);
-            }
-            //for (int i=0; i < reviewlist.size(); i++) {
-            //    if (reviewlist.get(i).get(0) != null) {
-            //        reviewsModel.addRow(new Object[]{reviewlist.get(i).get(0), reviewlist.get(i).get(1), reviewlist.get(i).get(2)});
-            //    }
-            //}
-            if (name == "Manager") {
+                
                 String sql_alloc = "SELECT talkID, title FROM Talk";
                 List<String> col_alloc = Arrays.asList("talkID", "title");
                 var alloclist = FairviewData.getData(sql_alloc, col_alloc);
@@ -178,6 +144,26 @@ public class FairviewGUI extends JFrame {
                         reviewerlist.get(0).get(0),
                         reviewerlist.get(1).get(0)
                     });
+                }
+            } else {
+                String sql_talks = "SELECT title, description, applicantID, score, feedback FROM Talk"
+                                   + " JOIN Review ON Talk.talkID = Review.talkID"
+                                   + " JOIN User on reviewerID = userID"
+                                   + " WHERE name=" + "'" + name + "'";
+                List<String> cols_talks = Arrays.asList("title", "description", "applicantID", "score", "feedback");
+                ArrayList<ArrayList<String>> talkslist = FairviewData.getData(sql_talks, cols_talks);
+                for (int i=0; i < talkslist.size(); i++) {
+                    String sql_app = "SELECT name, affiliation FROM User"
+                                     + " WHERE userID=" + "'" + talkslist.get(i).get(2) + "'";
+                    List<String> cols_app = Arrays.asList("name", "affiliation");
+                    ArrayList<String> app = FairviewData.getData(sql_app, cols_app).get(0);
+                    registry.setApplicant(app.get(0), app.get(1));
+                    Applicant a = registry.getApplicants().getLast();
+                    a.setSubmission(talkslist.get(i).get(0), talkslist.get(i).get(1));
+                    TalkSubmission t = a.getTalkSubmissions().getLast();
+                    Review r = new Review(registry.getReviewers().getFirst(), Integer.parseInt(talkslist.get(i).get(3)), talkslist.get(i).get(4));
+                    t.addReview(r);
+                    registry.getReviewers().getFirst().addAssignedTalk(t);
                 }
             }
         }
