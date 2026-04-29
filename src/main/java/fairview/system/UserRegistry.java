@@ -1,7 +1,6 @@
 package main.java.fairview.system;
 
-import fairview.users.*;
-import fairview.database.FairviewData;
+import main.java.fairview.database.FairviewData;
 
 import java.util.ArrayList;
 import java.util.List;

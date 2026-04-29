@@ -1,12 +1,10 @@
 package main.java.fairview.users;
 
-import fairview.database.FairviewData;
-import fairview.talks.TalkSubmission;
+import main.java.fairview.database.FairviewData;
+import main.java.fairview.talks.TalkSubmission;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
-import main.java.fairview.talks.TalkSubmission;
 
 public class Applicant extends User {
     private final List<TalkSubmission> talkSubmissions = new ArrayList<>();
@@ -36,6 +34,7 @@ public class Applicant extends User {
     public void setSubmission(String title, String description) {
         TalkSubmission s = new TalkSubmission(title, description, this);
         talkSubmissions.add(s);
+    }
 
     @Override
     public String toString() {

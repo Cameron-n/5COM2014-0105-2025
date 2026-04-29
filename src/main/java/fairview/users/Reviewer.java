@@ -1,8 +1,6 @@
 package main.java.fairview.users;
 
-import fairview.talks.TalkSubmission;
-import fairview.database.FairviewData;
-import fairview.talks.Review;
+import main.java.fairview.database.FairviewData;
 
 import java.util.ArrayList;
 import java.util.Arrays;
