@@ -111,10 +111,8 @@ public class FairviewGUI extends JFrame {
             registry.getApplicants().stream().filter(o -> o.getName().equals(applicantName)).forEach(
                 o -> {
                     o.setSubmission(talklist.get(index).get(0), talklist.get(index).get(2));
-                    List<TalkSubmission> submissionList = o.getTalkSubmissions();
-                    for (TalkSubmission j: submissionList) {
-                        conference.addSubmission(j);
-                    }
+                    List<TalkSubmission> talks = o.getTalkSubmissions();
+                    conference.addSubmission(talks.getLast());
                 }
             );
             submissionsModel.addRow(new Object[]{talklist.get(i).get(0), talklist.get(i).get(1), talklist.get(i).get(2)});
