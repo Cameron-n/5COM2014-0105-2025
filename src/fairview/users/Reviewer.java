@@ -16,7 +16,6 @@ public class Reviewer extends User {
     }
 
     public void addAssignedTalk(TalkSubmission talk) {
-        // TODO need to think about this more
         String sql_talk = "SELECT talkID FROM Talk"
                          + " WHERE title=" 
                          + "'" + talk.getTitle() + "';";
@@ -31,8 +30,8 @@ public class Reviewer extends User {
                      + "'" + reviewerID + "',"
                      + "'" + talkID + "'"
                      + ")";
-        FairviewData.addData(sql);
         assignedTalks.add(talk);
+        FairviewData.addData(sql);
     }
 
     public List<TalkSubmission> getAssignedTalks() {
@@ -44,7 +43,26 @@ public class Reviewer extends User {
             throw new IllegalArgumentException("Reviewer is not assigned to this talk.");
         }
         Review review = new Review(this, score, feedback);
-        talk.addReview(review);
+        
+        String sql_reviewerid = "SELECT userID FROM User"
+                                + " WHERE name=" + "'" + this.getName() + "'";
+        List<String> col_reviewerid = Arrays.asList("userID");
+        String reviewerid = FairviewData.getData(sql_reviewerid, col_reviewerid).get(0).get(0);
+
+        String sql_talkid = "SELECT talkID FROM Talk"
+                            + " WHERE title=" + "'" + talk.getTitle() + "'";
+        List<String>  col_talkid = Arrays.asList("talkID");
+        String talkid = FairviewData.getData(sql_talkid, col_talkid).get(0).get(0);
+
+        String sql = "UPDATE Review"
+                     + " SET score=" + score + ","
+                     + " feedback=" + "'" + feedback + "'"
+                     + " WHERE reviewerID=" + "'" + reviewerid + "'"
+                     + " AND talkID=" + "'" + talkid + "'";
+        boolean success = FairviewData.addData(sql);
+        if (success) {
+            talk.addReview(review);
+        }
         return review;
     }
 
