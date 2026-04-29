@@ -133,15 +133,24 @@ public class FairviewGUI extends JFrame {
                 service.allocate(conference);
             } else {
                 //TODO 
-                //get talks from database
-                //add to reviewers
                 //add reviews to talk
                 //Also, how is feedback added for applicants?
                 String sql_talks = "SELECT title, description, applicantID FROM Talk"
                                    + " JOIN Review ON Talk.talkID = Review.talkID"
-                                   + " AS t1"
                                    + " JOIN User on reviewerID=userID"
                                    + " WHERE name=" + "'" + name + "'";
+                List<String> cols_talks = Arrays.asList("title", "description", "applicantID");
+                ArrayList<ArrayList<String>> talkslist = FairviewData.getData(sql_talks, cols_talks);
+                for (int i=0; i < talkslist.size(); i++) {
+                    String sql_app = "SELECT name, affiliation FROM User"
+                                     + " WHERE userID=" + "'" + talkslist.get(i).get(2) + "'";
+                    List<String> cols_app = Arrays.asList("name", "affiliation");
+                    ArrayList<String> app = FairviewData.getData(sql_app, cols_app).get(0);
+                    Applicant a = new Applicant(app.get(0), app.get(1));
+                    TalkSubmission t = new TalkSubmission(talkslist.get(i).get(0), talkslist.get(i).get(1), a);
+                    registry.getReviewers().getFirst().addAssignedTalk(t);
+                }
+
             }
             if (!all) {
                 String sql_reviews = "SELECT score, feedback, talkID, reviewerID FROM Review"
@@ -150,11 +159,11 @@ public class FairviewGUI extends JFrame {
                 List<String> cols_rev = Arrays.asList("score", "feedback", "talkID", "reviewerID");
                 reviewlist = FairviewData.getData(sql_reviews, cols_rev);
             }
-            for (int i=0; i < reviewlist.size(); i++) {
-                if (reviewlist.get(i).get(0) != null) {
-                    reviewsModel.addRow(new Object[]{reviewlist.get(i).get(0), reviewlist.get(i).get(1), reviewlist.get(i).get(2)});
-                }
-            }
+            //for (int i=0; i < reviewlist.size(); i++) {
+            //    if (reviewlist.get(i).get(0) != null) {
+            //        reviewsModel.addRow(new Object[]{reviewlist.get(i).get(0), reviewlist.get(i).get(1), reviewlist.get(i).get(2)});
+            //    }
+            //}
             if (name == "Manager") {
                 String sql_alloc = "SELECT talkID, title FROM Talk";
                 List<String> col_alloc = Arrays.asList("talkID", "title");
@@ -246,16 +255,22 @@ public class FairviewGUI extends JFrame {
                     tabs.addTab("Feedback Reports", createFeedbackPanel());
                 } else if (role.equals("Applicant")) {
                     tabs.removeAll();
-                    tabs.addTab("Talk Submissions", createSubmissionsPanel());
+
                     loadUserData(false, name);
+
+                    tabs.addTab("Talk Submissions", createSubmissionsPanel());
                     loadTalkData(false, name);
+
                     loadReviewData(false, "Applicant");
+
                     tabs.addTab("Feedback Reports", createFeedbackPanel());
                 } else if (role.equals("Reviewer")) {
                     tabs.removeAll();
                     loadUserData(false, name);
-                    loadReviewData(false, name);
+
                     tabs.addTab("Reviews", createReviewsPanel());
+                    loadReviewData(false, name);
+
                     tabs.addTab("Feedback Reports", createFeedbackPanel());
                 }
             }

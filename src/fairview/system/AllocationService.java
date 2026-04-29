@@ -12,6 +12,7 @@ public class AllocationService {
     private final Random random = new Random();
 
     public void allocate(Conference conference) {
+        random.setSeed(0);
         if (!conference.areSubmissionsClosed()) {
             throw new IllegalStateException("Cannot allocate before submissions close.");
         }
