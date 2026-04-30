@@ -15,15 +15,16 @@ public class Applicant extends User {
 
     public boolean addSubmission(TalkSubmission submission) {
         String sql_get = "SELECT userID FROM User"
-                         + " WHERE name=" 
-                         + "'" + this.getName() + "';";
+                       + " WHERE name=" 
+                       + "'" + this.getName() + "';";
         List<String> sql_col = Arrays.asList("userID");
         String userID = FairviewData.getData(sql_get, sql_col).get(0).get(0);
+
         String sql = "INSERT INTO Talk(title, description, applicantID) VALUES("
-                     + "'" + submission.getTitle() + "'" + "," 
-                     + "'" + submission.getDescription() + "'" + "," 
-                     + "'" + userID + "'"
-                     + ")";
+                   + "'" + submission.getTitle() + "'" + "," 
+                   + "'" + submission.getDescription() + "'" + "," 
+                   + "'" + userID + "'"
+                   + ")";
         boolean success = FairviewData.addData(sql);
         if (success) {
             talkSubmissions.add(submission);

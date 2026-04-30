@@ -9,6 +9,9 @@ import fairview.talks.*;
 import fairview.users.*;
 
 import java.awt.*;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Arrays;
 import java.util.ArrayList;
@@ -19,10 +22,6 @@ public class FairviewGUI extends JFrame {
     private final UserRegistry registry;
 
     private JTabbedPane tabs;
-
-    // LOGIN PANEL
-    private JTable loginTable;
-    private DefaultTableModel loginModel;
 
     // USERS PANEL
     private JTable usersTable;
@@ -176,14 +175,11 @@ public class FairviewGUI extends JFrame {
     private JPanel createLoginPanel() {
         JPanel panel = new JPanel(new BorderLayout());
 
-        String[] cols = {"Name", "Password"};
-        loginModel = new DefaultTableModel(cols, 0);
-
-        JButton addUserBtn = new JButton("Login");
-        addUserBtn.addActionListener(e -> showLoginDialog());
+        JButton addLoginBtn = new JButton("Login");
+        addLoginBtn.addActionListener(e -> showLoginDialog());
 
         JPanel bottom = new JPanel();
-        bottom.add(addUserBtn);
+        bottom.add(addLoginBtn);
         panel.add(bottom, BorderLayout.SOUTH);
 
         return panel;
@@ -213,20 +209,22 @@ public class FairviewGUI extends JFrame {
                          + " WHERE name="
                          + "'" + name + "'";
             List<String> cols = Arrays.asList("password", "userType");
-            
             String role;
             String password = " ";
             try {
                 ArrayList<ArrayList<String>> data = FairviewData.getData(sql, cols);
                 role = data.get(0).get(1);
                 password = data.get(0).get(0);
-            } catch(Exception err) {
+            } catch (Exception err) {
                 role = "";
             }
             
+            //display tabs based on role permissions
             if (pass.equals(password)) {
                 if (role.equals("Manager")) {
                     tabs.removeAll();
+
+                    tabs.addTab("Config", createConfigPanel());
 
                     tabs.addTab("Users", createUsersPanel());
                     loadUserData(true, name);
@@ -270,6 +268,58 @@ public class FairviewGUI extends JFrame {
         dialog.setVisible(true);
     }
 
+    // ---------------------------------------------------------
+    // CONFIGURATION PANEL
+    // ---------------------------------------------------------
+    private JPanel createConfigPanel() {
+        JPanel panel = new JPanel(new BorderLayout());
+        FairviewTheme.stylePanel(panel);
+
+        JButton addConfBtn = new JButton("Set Config");
+        FairviewTheme.styleButton(addConfBtn);
+        addConfBtn.addActionListener(e -> showSetConfigDialog());
+
+        JPanel bottom = new JPanel();
+        bottom.setBackground(FairviewTheme.BACKGROUND);
+        bottom.add(addConfBtn);
+        panel.add(bottom, BorderLayout.SOUTH);
+
+        return panel;
+    }
+
+    private void showSetConfigDialog() {
+        JDialog dialog = new JDialog(this, "Set Config", true);
+        dialog.setSize(400, 250);
+        dialog.setLocationRelativeTo(this);
+
+        JPanel form = new JPanel(new GridLayout(3, 2, 10, 10));
+        FairviewTheme.styleCard(form);
+
+        DateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+        JFormattedTextField dateField = new JFormattedTextField(format);
+        JTextField slotField = new JTextField();
+
+        form.add(new JLabel("Close Date (yyyy-MM-dd):"));
+        form.add(dateField);
+        form.add(new JLabel("Number of Slots:"));
+        form.add(slotField);
+
+        JButton save = new JButton("Save");
+        FairviewTheme.styleButton(save);
+        save.addActionListener(e -> {
+            String date_string = dateField.getText();
+            LocalDate date = LocalDate.parse(date_string); 
+            String slot_string = slotField.getText();
+            int slot = Integer.parseInt(slot_string);
+
+            conference.getManager().configureConference(slot, date);
+            dialog.dispose();
+        });
+
+        form.add(save);
+        dialog.add(form);
+        dialog.setVisible(true);
+    }
     // ---------------------------------------------------------
     // USERS PANEL
     // ---------------------------------------------------------

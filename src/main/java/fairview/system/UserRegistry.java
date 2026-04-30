@@ -22,11 +22,11 @@ public class UserRegistry {
 
     public boolean registerApplicant(Applicant applicant, String pass) {
         String sql = "INSERT INTO User(name, password, affiliation, userType) VALUES("
-                     + "'" + applicant.getName() + "'" + "," 
-                     + "'" + pass + "'" + ","
-                     + "'" + applicant.getAffiliation() + "'" + "," 
-                     + "'" + "Applicant" + "'"
-                     + ")";
+                   + "'" + applicant.getName() + "'" + "," 
+                   + "'" + pass + "'" + ","
+                   + "'" + applicant.getAffiliation() + "'" + "," 
+                   + "'" + "Applicant" + "'"
+                   + ")";
         boolean success = FairviewData.addData(sql);
         if (success) {
             applicants.add(applicant);
@@ -36,11 +36,11 @@ public class UserRegistry {
 
     public boolean registerReviewer(Reviewer reviewer, String pass) {
         String sql = "INSERT INTO User(name, password, affiliation, userType) VALUES("
-                     + "'" + reviewer.getName() + "'" + "," 
-                     + "'" + pass + "'" + ","
-                     + "'" + reviewer.getAffiliation() + "'" + "," 
-                     + "'" + "Reviewer" + "'"
-                     + ")";
+                   + "'" + reviewer.getName() + "'" + "," 
+                   + "'" + pass + "'" + ","
+                   + "'" + reviewer.getAffiliation() + "'" + "," 
+                   + "'" + "Reviewer" + "'"
+                   + ")";
         boolean success = FairviewData.addData(sql);
         if (success) {
             reviewers.add(reviewer);

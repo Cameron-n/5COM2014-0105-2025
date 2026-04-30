@@ -1,3 +1,4 @@
+package fairview.database;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
@@ -86,7 +87,7 @@ public class FairviewDatabaseSetup {
         
         //add test data
         sql = "INSERT INTO User(name, password, affiliation, userType) VALUES("
-            + "     'manager', 'manager', 'manager', 'Manager'"
+            + "     'manager', 'manager', 'ConferenceOrg', 'Manager'"
             + "     ),("
             + "     'applicant1', 'applicant1', 'TESCO', 'Applicant'"
             + "     ),("
