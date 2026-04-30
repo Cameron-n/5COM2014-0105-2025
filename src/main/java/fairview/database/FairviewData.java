@@ -1,4 +1,4 @@
-package main.java.fairview.database;
+package fairview.database;
 
 import java.sql.DriverManager;
 import java.sql.SQLException;

@@ -1,6 +1,6 @@
-package main.java.fairview.talks;
+package fairview.talks;
 
-import main.java.fairview.users.Reviewer;
+import fairview.users.Reviewer;
 
 public class Review {
     private final Reviewer reviewer;

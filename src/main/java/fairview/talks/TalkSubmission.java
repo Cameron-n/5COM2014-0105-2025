@@ -1,9 +1,9 @@
-package main.java.fairview.talks;
+package fairview.talks;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import main.java.fairview.users.Applicant;
+import fairview.users.Applicant;
 
 public class TalkSubmission {
     private final String title;

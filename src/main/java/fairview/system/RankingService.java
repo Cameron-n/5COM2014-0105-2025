@@ -1,4 +1,4 @@
-package main.java.fairview.system;
+package fairview.system;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -6,7 +6,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Random;
 
-import main.java.fairview.talks.TalkSubmission;
+import fairview.talks.TalkSubmission;
 
 public class RankingService {
 

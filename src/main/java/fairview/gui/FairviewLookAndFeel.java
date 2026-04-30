@@ -1,4 +1,4 @@
-package main.java.fairview.gui;
+package fairview.gui;
 
 import javax.swing.*;
 

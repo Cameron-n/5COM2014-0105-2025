@@ -1,11 +1,11 @@
-package main.java.fairview.system;
+package fairview.system;
 
-import main.java.fairview.database.FairviewData;
+import fairview.database.FairviewData;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import main.java.fairview.users.*;
+import fairview.users.*;
 
 public class UserRegistry {
 

@@ -1,12 +1,12 @@
-package main.java.fairview.gui;
+package fairview.gui;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 
-import main.java.fairview.database.FairviewData;
-import main.java.fairview.system.*;
-import main.java.fairview.talks.*;
-import main.java.fairview.users.*;
+import fairview.database.FairviewData;
+import fairview.system.*;
+import fairview.talks.*;
+import fairview.users.*;
 
 import java.awt.*;
 import java.util.List;

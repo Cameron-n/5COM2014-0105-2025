@@ -1,13 +1,13 @@
-package main.java.fairview.users;
+package fairview.users;
 
-import main.java.fairview.database.FairviewData;
+import fairview.database.FairviewData;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import main.java.fairview.talks.Review;
-import main.java.fairview.talks.TalkSubmission;
+import fairview.talks.Review;
+import fairview.talks.TalkSubmission;
 
 public class Reviewer extends User {
     private final List<TalkSubmission> assignedTalks = new ArrayList<>();
