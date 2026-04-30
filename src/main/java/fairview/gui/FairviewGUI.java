@@ -278,10 +278,15 @@ public class FairviewGUI extends JFrame {
         JButton addConfBtn = new JButton("Set Config");
         FairviewTheme.styleButton(addConfBtn);
         addConfBtn.addActionListener(e -> showSetConfigDialog());
+        
+        JButton addCloseBtn = new JButton("Close Early");
+        FairviewTheme.styleButton(addCloseBtn);
+        addCloseBtn.addActionListener(e -> conference.closeSubmissions());
 
         JPanel bottom = new JPanel();
         bottom.setBackground(FairviewTheme.BACKGROUND);
         bottom.add(addConfBtn);
+        bottom.add(addCloseBtn);
         panel.add(bottom, BorderLayout.SOUTH);
 
         return panel;
