@@ -161,8 +161,10 @@ public class FairviewGUI extends JFrame {
                     Applicant a = registry.getApplicants().getLast();
                     a.setSubmission(talkslist.get(i).get(0), talkslist.get(i).get(1));
                     TalkSubmission t = a.getTalkSubmissions().getLast();
-                    Review r = new Review(registry.getReviewers().getFirst(), Integer.parseInt(talkslist.get(i).get(3)), talkslist.get(i).get(4));
-                    t.addReview(r);
+                    if (talkslist.get(i).get(3) != null) {
+                        Review r = new Review(registry.getReviewers().getFirst(), Integer.parseInt(talkslist.get(i).get(3)), talkslist.get(i).get(4));
+                        t.addReview(r);
+                    }
                     registry.getReviewers().getFirst().addAssignedTalk(t);
                 }
             }
